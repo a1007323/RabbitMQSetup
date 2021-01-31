@@ -14,7 +14,7 @@ rabbitmq_config: []
 # Defines if rabbitmq ha should be configured
 rabbitmq_config_ha: false
 
-rabbitmq_config_service: false
+rabbitmq_config_service: true
 rabbitmq_config_file: etc/rabbitmq/rabbitmq.config.j2
 rabbitmq_config_env_file: etc/rabbitmq/rabbitmq-env.conf.j2
 rabbitmq_env_config: {}
@@ -58,9 +58,9 @@ rabitmq_ssl_options: {}
 # fail_if_no_peer_cert: "false"
 
 rabbitmq_redhat_repo_key: https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
-rabbitmq_redhat_package: "rabbitmq-server-{{ rabbitmq_redhat_version }}-1.noarch.rpm"
-rabbitmq_redhat_url: "http://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbitmq_redhat_version }}"
-rabbitmq_redhat_version: 3.6.1
+rabbitmq_redhat_package: "rabbitmq-server-{{ rabbitmq_redhat_version }}-1.el8.noarch.rpm"
+rabbitmq_redhat_url: "https://dl.bintray.com/rabbitmq/rpm/rabbitmq-server/v3.8.x/el/8/noarch"
+rabbitmq_redhat_version: 3.8.9
 
 # Define extra vhosts to be created
 rabbitmq_extra_vhosts: []
