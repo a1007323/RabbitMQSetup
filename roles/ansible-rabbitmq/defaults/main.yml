@@ -1,18 +1,18 @@
 ---
 # defaults file for ansible-rabbitmq
-rabbitmq_config: []
-# - queue_name: logstash
-#   durable: true
-#   exchange_name: logstash
-#   type: direct
-#   routing_key: logstash
-#   tags: "ha-mode=all,ha-sync-mode=automatic"
-# - policy_pattern: ".*"
-#   vhost: apps
-#   tags: "ha-mode=all,ha-sync-mode=automatic"
+rabbitmq_config:
+  - queue_name: logstash
+    durable: true
+    exchange_name: logstash
+    type: direct
+    routing_key: logstash
+    tags: "ha-mode=all,ha-sync-mode=automatic"
+  - policy_pattern: ".*"
+    vhost: vhost1
+    tags: "ha-mode=all,ha-sync-mode=automatic"
 
 # Defines if rabbitmq ha should be configured
-rabbitmq_config_ha: false
+rabbitmq_config_ha: true
 
 rabbitmq_config_service: true
 rabbitmq_config_file: etc/rabbitmq/rabbitmq.config.j2
@@ -30,9 +30,9 @@ rabbitmq_debian_erlang_from_rabbit: true
 rabbitmq_debian_version: 3.7.24-1
 
 # Defines if setting up a rabbitmq cluster
-rabbitmq_enable_clustering: false
+rabbitmq_enable_clustering: true
 # Defines the inventory host that should be considered master
-rabbitmq_master: None
+rabbitmq_master: localhost
 
 rabbitmq_erlang_cookie_file: /var/lib/rabbitmq/.erlang.cookie
 
@@ -62,10 +62,14 @@ rabbitmq_redhat_package: "rabbitmq-server-{{ rabbitmq_redhat_version }}-1.el8.no
 rabbitmq_redhat_url: "https://dl.bintray.com/rabbitmq/rpm/rabbitmq-server/v3.8.x/el/8/noarch"
 rabbitmq_redhat_version: 3.8.9
 
-# Define extra vhosts to be created
-rabbitmq_extra_vhosts: []
-# - name: /
-#   state: present
+#Define extra vhosts to be created
+rabbitmq_extra_vhosts:
+  - name: vhost1
+    state: present
+  - name: vhost2
+    state: present
+  - name: vhost3
+    state: present
 
 # Define admin user to create in order to login to WebUI
 rabbitmq_users:
@@ -80,3 +84,6 @@ rabbitmq_users:
     # required for management plugin.
     # https://www.rabbitmq.com/management.html
     tags: administrator
+
+#URL to download epel-repository
+epel_release: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm

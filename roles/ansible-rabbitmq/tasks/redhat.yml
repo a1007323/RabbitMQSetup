@@ -1,7 +1,7 @@
 ---
 - name: redhat | installing pre-reqs
-  yum:
-    name: ['epel-release', 'wget']
+  dnf:
+    name: "{{ epel_release }}"
     state: present
   become: true
   register: result

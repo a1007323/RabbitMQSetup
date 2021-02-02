@@ -1,0 +1,4 @@
+test ; line
+test ; line 2
+test non semicolon line:x
+
