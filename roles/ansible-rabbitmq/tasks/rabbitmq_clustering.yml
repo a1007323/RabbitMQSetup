@@ -14,6 +14,11 @@
     name: rabbitmq-server
     state: stopped
   become: true
+  # when: inventory_hostname != rabbitmq_master
+
+- name: debugging server names
+  debug:
+    msg: "Inventory server {{ inventory_hostname }} and master server {{ rabbitmq_master }}"
 
 - name: rabbitmq_clustering | Capturing Erlang Cookie On Master
   command: "cat {{ rabbitmq_erlang_cookie_file }}"
@@ -74,7 +79,7 @@
   when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | joining rabbitmq cluster
-  command: rabbitmqctl join_cluster "rabbit@{{ hostvars[rabbitmq_master]['ansible_hostname'] }}"
+  command: rabbitmqctl join_cluster rabbit@rabbitmqmaster.eastus.cloudapp.azure.com
   register: cluster_joined
   become: true
   when: inventory_hostname != rabbitmq_master

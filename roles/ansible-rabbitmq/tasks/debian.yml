@@ -1,65 +1,94 @@
 ---
-- name: debian | Adding Pre-Reqs
+
+- name: Install basic packages
   apt:
     name:
-      - gnupg2
+      - vim
+      - curl
+      - python3-pip
+      - apache2
+      - libapache2-mod-wsgi-py3
+      - mysql-server
+      - libmysqlclient-dev
+    state: latest
+    cache_valid_time: 3600
+
+- name: Curl for RabbitMQ
+  shell: curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add -
+
+- name: Add an apt key by id from a keyserver
+  apt_key:
+    keyserver: hkps://keys.openpgp.org
+    id: 0A9AF2115F4687BD29803A206B73A36E6026DFCA
+
+- name: Install transport http
+  apt:
+    name:
       - apt-transport-https
-    state: present
-  become: true
-  register: result
-  until: result is successful
+    state: latest
+    cache_valid_time: 3600
 
-- name: debian | adding RabbitMQ public GPG key to the apt repo
-  apt_key:
-    url: "{{ rabbitmq_debian_repo_key }}"
-    state: present
-  become: true
-  register: result
-  until: result is successful
+- name: Insert/Update /etc/apt/sources.list.d/bintray.erlang.list file
+  blockinfile:
+    path: /etc/apt/sources.list.d/bintray.erlang.list
+    block: |
+      # >>> Bionic version is for ubuntu 18.04
+      # This repository provides Erlang packages produced by the RabbitMQ team
+      # See below for supported distribution and component values
+      deb https://dl.bintray.com/rabbitmq-erlang/debian {{ ansible_distribution_release }} erlang-22.x
+    create: yes
 
-- name: debian | adding RabbitMQ repo
-  apt_repository:
-    repo: "{{ rabbitmq_debian_repo }}"
-    state: present
-  become: true
-  register: result
-  until: result is successful
+- name: Update apt-get repo and cache
+  apt: update_cache=yes force_apt_get=yes 
 
-- name: debian | add Rabbitmq erlang repo key
-  apt_key:
-    url: https://bintray.com/user/downloadSubjectPublicKey?username=rabbitmq-erlang
-    state: present
-  become: true
-  register: result
-  until: result is successful
-  when: rabbitmq_debian_erlang_from_rabbit
-
-- name: debian | add Rabbitmq erlang repo
-  apt_repository:
-    repo: deb https://dl.bintray.com/rabbitmq-erlang/debian {{ ansible_distribution_release }} erlang
-    state: present
-  become: true
-  when: rabbitmq_debian_erlang_from_rabbit
-
-- name: debian | installing RabbitMQ server
+- name: Install erlang packages
   apt:
     name:
-      - rabbitmq-server{{ (rabbitmq_debian_version is defined) | ternary(['=',rabbitmq_debian_version] | join(''),'') }}
-    state: present
-  become: true
-  register: result
-  until: result is successful
+      - erlang-base
+      - erlang-asn1
+      - erlang-crypto
+      - erlang-eldap
+      - erlang-ftp
+      - erlang-inets
+      - erlang-mnesia
+      - erlang-os-mon
+      - erlang-parsetools
+      - erlang-public-key
+      - erlang-runtime-tools
+      - erlang-snmp
+      - erlang-ssl
+      - erlang-syntax-tools
+      - erlang-tftp
+      - erlang-tools
+      - erlang-xmerl
+    state: latest
+    cache_valid_time: 3600
+
+- shell: echo "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_distribution_release }} main" | sudo tee /etc/apt/sources.list.d/bintray.rabbitmq.list
+  register: echoout
+- debug: msg= "the echo was {{ echoout.stdout }}"
+
+- name: Update apt-get repo and cache
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Install RabbitMQ Server
+  apt:
+    name:
+      - rabbitmq-server
+    state: latest
+    cache_valid_time: 3600
 
 - name: debian | enabling the RabbitMQ Management Console
   rabbitmq_plugin:
     names: rabbitmq_management
     state: enabled
   become: true
-  notify: restart rabbitmq-server
+  notify: restart rabbitmq-server    
 
-- name: debian | ensuring that the RabbitMQ service is running
+- name: start & enable RabbitMQ Server
   service:
-    name: rabbitmq-server
-    state: started
-    enabled: yes
+    name=rabbitmq-server
+    state=started
+    enabled=yes
   become: true
+ 
