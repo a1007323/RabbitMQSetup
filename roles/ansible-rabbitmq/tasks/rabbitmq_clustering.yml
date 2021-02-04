@@ -14,7 +14,7 @@
     name: rabbitmq-server
     state: stopped
   become: true
-  # when: inventory_hostname != rabbitmq_master
+  when: inventory_hostname != rabbitmq_master
 
 - name: debugging server names
   debug:
@@ -79,7 +79,7 @@
   when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | joining rabbitmq cluster
-  command: rabbitmqctl join_cluster rabbit@rabbitmqmaster.eastus.cloudapp.azure.com
+  command: rabbitmqctl join_cluster "rabbit@{{ hostvars[rabbitmq_master]['ansible_hostname'] }}"
   register: cluster_joined
   become: true
   when: inventory_hostname != rabbitmq_master

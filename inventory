@@ -1,2 +1,4 @@
 localhost
-rabbitmqslave1.centralindia.cloudapp.azure.com
+rabbitmqslave1
+rabbitmqslave4
+rabbitmqslave3
